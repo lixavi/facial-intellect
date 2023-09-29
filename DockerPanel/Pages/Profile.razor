@@ -1,0 +1,102 @@
+﻿@page "/profile"
+@inject IDoctorInfoService doctorservice
+@using ClassLibraryDAL
+@using ClassLibraryEntities
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorageService;
+@inject NavigationManager navigationManager
+
+<div class="row mb-4">
+    <div class="col-md-12 border-bottom">
+        <h4>Manaage Profile </h4>
+    </div>
+</div>
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-md-6">
+            <EditForm Model="ModelCareho" OnSubmit="UpdateCareoInfo">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            @*<img src="@ModelCareho.ImageUrl" class="image-fluid" />*@
+                        </div>
+                    </div>
+                </div>
+                <table class="table">
+
+                    <tr>
+                        <td>
+                            <InputText DisplayName="Title" @bind-Value="ModelCareho.first_name" Disabled class="form-control"></InputText>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <InputText DisplayName="Area" @bind-Value="ModelCareho.last_name" Disabled class="form-control"></InputText>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <InputText DisplayName="PhoneNo" @bind-Value="ModelCareho.phone_number" class="form-control"></InputText>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <InputText DisplayName="WhatsApp" @bind-Value="ModelCareho.email" class="form-control"></InputText>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <InputText DisplayName="FaceBookUrl" @bind-Value="ModelCareho.username" class="form-control"></InputText>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <InputText DisplayName="InstaUrl" @bind-Value="ModelCareho.password" class="form-control"></InputText>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button type="submit" class="btn btn-outline-primary">Update Information</button>
+                        </td>
+                    </tr>
+                </table>
+
+
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    private EntDoctorInfo ModelCareho { get; set; } = new EntDoctorInfo();
+    private string? CarehoId { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        CarehoId = await sessionStorageService.GetItemAsync<string>("id");
+        StateHasChanged(); 
+         await LoadCareho();
+        
+    }
+    private void UpdateCareoInfo()
+    {
+        doctorservice.UpdateDoctorInfo(ModelCareho);
+
+         //LoadCareho();
+    }
+    private async Task LoadCareho()
+    {
+        if (!string.IsNullOrEmpty(CarehoId))
+        {
+            ModelCareho = await doctorservice.GetDoctorInfoById(int.Parse(CarehoId));
+        }
+        else
+        {
+            navigationManager.NavigateTo("login");
+        }
+    }
+
+}
+
+

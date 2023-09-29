@@ -1,0 +1,70 @@
+﻿@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager nm
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Admin @sessionName</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <button @onclick="logout" class="btn btn-danger form-control">Logout</button>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="profile">
+                <span class="oi oi-plus" aria-hidden="true"></span> Manage Profile
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="carehoselectedcategories">
+                <span class="oi oi-plus" aria-hidden="true"></span>Make Menu
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="menu">
+                <span class="oi oi-plus" aria-hidden="true"></span> Buffet Menu
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="upload">
+                <span class="oi oi-plus" aria-hidden="true"></span> Upload
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private string? sessionName { get; set; }
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        sessionName = await sessionStorage.GetItemAsync<string>("CarehoTitle");
+        //StateHasChanged();
+    }
+
+    private async void logout()
+    {
+        // await sessionStorage.SetItemAsync("SessionUsername", "null");
+        await sessionStorage.RemoveItemAsync("CarehoTitle");
+        await sessionStorage.RemoveItemAsync("CarehoId");
+        nm.NavigateTo("login");
+    }
+}

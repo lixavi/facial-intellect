@@ -1,0 +1,115 @@
+﻿@layout SecondaryLayout
+@page "/login"
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager nm
+@inject IDoctorInfoService doctorservice 
+
+@using ClassLibraryEntities
+@using ClassLibraryDAL
+@if (isAlert)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+         Registration Sucessfully
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-4 offset-4">
+            <div class="card">
+                <div  class="card-body text-center bg-light shadow">
+                    <img src="images/carehologo.png" width="50" class="mt-3" />
+                    <h3>@title</h3>
+
+                    <EditForm Model="ModelDoctor" OnSubmit="CarehoAuth">
+                        <div>
+                            <InputText @bind-Value="ModelDoctor.username" PlaceHolder="User Name" class="form-control mb-1"></InputText>
+                        </div>
+                        <div>
+                            <InputText @bind-Value="ModelDoctor.password" PlaceHolder="Passowrd" class="form-control mb-1" type="password"></InputText>
+                        </div>
+                        @if (isRegistration) {
+                            <div>
+                                <InputText @bind-Value="ModelDoctor.first_name" PlaceHolder="Name" class="form-control mb-1" type="text"></InputText>
+                            </div>
+                        }
+                        <div>
+                            <button class="btn btn-dark form-control mt-3">@title</button>
+                        </div>
+                        <div class="mt-2">
+                            <a href="#" class="small">Forgot Password</a>
+                            @if (!isRegistration) {
+                            <button type="button" @onclick="Register" class="small" style="background-color:transparent;border:none;">Registration</button>
+                            }
+                            @if(isRegistration){
+                            <button type="button" @onclick="login" class="small" style="background-color:transparent;border:none;">login</button>
+                            }
+                        </div>
+                    </EditForm>
+                    <label class="text-danger">@ErrorMessage</label>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    public string? title { get; set; } = "Login";
+    private EntDoctorInfo ModelDoctor { get; set; } = new EntDoctorInfo();
+    private string? ErrorMessage { get; set; }
+    private List<EntDoctorInfo> ListDoctor { get; set; } = new List<EntDoctorInfo>();
+    public bool isRegistration = false;
+    public bool isAlert = false;
+    private async void CarehoAuth()
+    {
+
+
+        if (isRegistration)
+        {
+            var response = await doctorservice.SaveRegistrationInfo(ModelDoctor);
+            StateHasChanged();
+            if (response != null)
+            {
+
+                isAlert = true;
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            ListDoctor = await doctorservice.GetDoctorAuth(ModelDoctor);
+            if (ListDoctor.Count > 0)
+            {
+                await sessionStorage.SetItemAsync("id", ListDoctor[0].id);
+                await sessionStorage.SetItemAsync("name", ListDoctor[0].first_name);
+                nm.NavigateTo("/");
+            }
+            else
+            {
+                ErrorMessage = "Invalid Username or Password";
+            }
+            
+        }
+
+    }
+
+    public void Register()
+    {
+
+        isRegistration = true;
+        title = "Registration";
+
+    }
+    public void login()
+    {
+
+        isRegistration = false;
+        title = "login";
+
+    }
+   
+}

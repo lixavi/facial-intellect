@@ -1,0 +1,31 @@
+﻿@page "/"
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager nm
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, @CarehoTitle!</h1>
+
+Welcome to your new app.
+@code {
+    private string? CarehoTitle { get; set; }
+
+
+    protected override async void OnInitialized()
+    {
+        CarehoTitle = await sessionStorage.GetItemAsync<string>("name");
+        StateHasChanged();
+
+        if (string.IsNullOrEmpty(CarehoTitle))
+        {
+            nm.NavigateTo("login");
+        }
+
+    }
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //   sessionName = await sessionStorage.GetItemAsync<string>("SessionUsername");
+    //    //StateHasChanged();
+    //}
+}
