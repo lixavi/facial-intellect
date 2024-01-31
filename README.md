@@ -1,4 +1,4 @@
-# FacialIntellect
+# Facial Intellect
 
 FacialIntellect is a Python library that incorporates deep learning models from the dlib and OpenCV libraries for facial recognition tasks. It provides functionalities for face detection, facial landmark detection, and face recognition.
 
